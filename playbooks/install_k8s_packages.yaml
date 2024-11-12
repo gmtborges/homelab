@@ -1,0 +1,45 @@
+- name: Configure Kubernetes repository and install packages
+  hosts: k8s
+  become: true
+  tasks:
+    - name: Ensure gpg and curl are installed
+      ansible.builtin.apt:
+        name:
+          - curl
+          - gpg
+        state: present
+
+    - name: Ensure the /etc/apt/keyrings directory exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Download Kubernetes GPG key
+      ansible.builtin.get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+        mode: "0644"
+
+    - name: Add Kubernetes APT repository
+      ansible.builtin.copy:
+        content: |
+          deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Update apt package index
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install required Kubernetes packages
+      ansible.builtin.apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: latest

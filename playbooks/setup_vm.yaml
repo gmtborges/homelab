@@ -1,0 +1,39 @@
+---
+- name: Configure static IP using Netplan
+  hosts: all
+  become: true
+  tasks:
+    - name: Set the new hostname
+      ansible.builtin.hostname:
+        name: "{{ hostname }}"
+      notify: Update /etc/hosts with new hostname
+
+    - name: Create a Netplan configuration for static IP
+      ansible.builtin.copy:
+        dest: /etc/netplan/50-cloud-init.yaml
+        content: |
+          network:
+            version: 2
+            ethernets:
+              ens18:
+                addresses:
+                  - {{ ip_address }}/24
+                nameservers:
+                  addresses: {{ dns }}
+                routes:
+                  - to: default
+                    via: {{ gateway }}
+        mode: "644"
+
+      notify: Apply netplan configuration
+
+  handlers:
+    - name: Update /etc/hosts with new hostname
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: "^127\\.0\\.1\\.1\\s+.*$"
+        line: "127.0.1.1 {{ hostname }}"
+
+    - name: Apply netplan configuration
+      ansible.builtin.command: netplan apply
+      changed_when: false

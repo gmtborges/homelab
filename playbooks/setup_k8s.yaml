@@ -1,0 +1,94 @@
+---
+- name: Bootstrap k8s
+  hosts: k8s
+  become: true
+  tasks:
+    - name: Install containerd
+      ansible.builtin.apt:
+        name: containerd
+        state: present
+
+    - name: Create containerd config dir
+      ansible.builtin.file:
+        path: /etc/containerd
+        owner: root
+        group: root
+        state: directory
+        mode: "0755"
+
+    - name: Generate default containerd configuration
+      ansible.builtin.command: containerd config default
+      register: containerd_default_config
+
+    - name: Save containerd default configuration to /etc/containerd/config.toml
+      ansible.builtin.copy:
+        content: "{{ containerd_default_config.stdout }}"
+        dest: /etc/containerd/config.toml
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Update SystemdCgroup to True in containerd config
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: '^(\s*SystemdCgroup\s*=\s*)false'
+        line: '\1true'
+        backrefs: yes
+      notify:
+        - Restart containerd
+
+    - name: Disable swap temporarily
+      command: swapoff -a
+      register: swapoff_result
+      changed_when: swapoff_result.rc == 0
+
+    - name: Remove swap entry from /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: "^.*swap.*$"
+        state: absent
+      notify:
+        - Reload systemd daemon
+
+    - name: Ensure net.ipv4.ip_forward is set in sysctl.conf
+      lineinfile:
+        path: /etc/sysctl.conf
+        regexp: '^net.ipv4.ip_forward\s*='
+        line: "net.ipv4.ip_forward = 1"
+        state: present
+
+    - name: Ensure net.ipv6.conf.all.forwarding is set in sysctl.conf
+      lineinfile:
+        path: /etc/sysctl.conf
+        regexp: '^net.ipv6.conf.all.forwarding\s*='
+        line: "net.ipv6.conf.all.forwarding = 1"
+        state: present
+
+    - name: Apply sysctl changes
+      command: sysctl -p
+
+    - name: Create k8s.conf for module loading
+      copy:
+        dest: /etc/modules-load.d/k8s.conf
+        content: |
+          br_netfilter
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Load br_netfilter module
+      command: modprobe br_netfilter
+      register: modprobe_result
+      changed_when: modprobe_result.rc == 0
+
+    - name: Ensure br_netfilter is loaded at boot
+      shell: lsmod | grep br_netfilter
+      register: lsmod_check
+      failed_when: "'br_netfilter' not in lsmod_check.stdout"
+
+  handlers:
+    - name: Reload systemd daemon
+      command: systemctl daemon-reload
+
+    - name: Restart containerd
+      command: systemctl restart containerd
