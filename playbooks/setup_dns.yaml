@@ -19,12 +19,10 @@
               ens18:
                 dhcp4: false
                 addresses:
-                  - {{ ip_address }}/24
+                  - {{ ipv4_address }}/24
                 nameservers:
                   addresses: {{ dns }}
-                routes:
-                  - to: default
-                    via: {{ gateway }}
+                gateway4: {{ gateway4 }}
         mode: "644"
       register: netplan_config
       notify: Apply netplan config
