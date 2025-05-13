@@ -1,0 +1,17 @@
+- name: Expand partition to maximum disk size
+  hosts: k8s
+  become: true
+  vars:
+    device: "/dev/sda"
+    partition: "2"
+  tasks:
+    - name: Resize partition to use maximum available space
+      ansible.builtin.command: "growpart {{ device }} {{ partition }}"
+      register: growpart_result
+      failed_when:
+        - growpart_result.rc != 0
+        - "'NOCHANGE' not in growpart_result.stdout"
+      changed_when: growpart_result.rc == 0
+    - name: Resize filesystem to use all available space
+      ansible.builtin.command: "resize2fs {{ device }}{{ partition }}"
+      changed_when: false

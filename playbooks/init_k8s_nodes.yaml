@@ -1,25 +1,19 @@
----
-- hosts: k8s_control_lplane
+- hosts: k8s_control_plane
   become: true
   tasks:
     - name: Initialize Kubernetes master
       command: kubeadm init --pod-network-cidr=10.244.0.0/16
       register: kubeadm_output
       ignore_errors: true
-
     - name: Set up kubectl for the current user
       command: "{{ item }}"
       with_items:
         - "mkdir -p $HOME/.kube"
         - "cp /etc/kubernetes/admin.conf $HOME/.kube/config"
         - "chown $(id -u):$(id -g) $HOME/.kube/config"
-
     - name: Install Flannel network plugin
-      command:
-        kubectl apply -f
-        https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+      command: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
       when: "'flannel' in kubeadm_output.stdout"
-
 - hosts: k8s_nodes
   become: true
   tasks:

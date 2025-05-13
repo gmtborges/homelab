@@ -1,5 +1,4 @@
 # vim:ft=yaml.ansible
----
 - name: Configure Kubernetes repository and install packages
   hosts: k8s
   become: true
@@ -10,7 +9,6 @@
           - curl
           - gpg
         state: present
-
     - name: Ensure the /etc/apt/keyrings directory exists
       ansible.builtin.file:
         path: /etc/apt/keyrings
@@ -18,13 +16,11 @@
         owner: root
         group: root
         mode: "0755"
-
     - name: Download Kubernetes GPG key
       ansible.builtin.get_url:
         url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
         dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
         mode: "0644"
-
     - name: Add Kubernetes APT repository
       ansible.builtin.copy:
         content: |
@@ -33,11 +29,9 @@
         owner: root
         group: root
         mode: "0644"
-
     - name: Update apt package index
       ansible.builtin.apt:
         update_cache: true
-
     - name: Install required Kubernetes packages
       ansible.builtin.apt:
         name:

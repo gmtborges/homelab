@@ -10,11 +10,10 @@ spec:
       targetRevision: 35.2.0
       chart: traefik
       helm:
-        valueFiles:
-          - $homelab/argocd/values/traefik/values.yaml
-    - repoURL: "https://github.com/gmtborges/homelab.git"
-      targetRevision: main
-      ref: homelab
+        values: |
+          providers:
+            kubernetesGateway:
+              enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
