@@ -19,12 +19,12 @@ spec:
           runners:
             secret: gitlab-runner
             config: |
-            [[runners]]
-              [runners.kubernetes]
-                image = "alpine"
-                service_account = "gitlab-runner"
-                namespace = "gitlab"
-                privileged = true
+              [[runners]]
+                [runners.kubernetes]
+                  image = "alpine"
+                  service_account = "gitlab-runner"
+                  namespace = "gitlab"
+                  privileged = true
   destination:
     server: https://kubernetes.default.svc
     namespace: gitlab
