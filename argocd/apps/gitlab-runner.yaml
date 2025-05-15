@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/gmtborges/homelab.git
+      targetRevision: HEAD
+      ref: manifests
+      path: argocd/manifests/gitlab-runner
+    - chart: gitlab-runner
+      repoURL: https://charts.gitlab.io
+      targetRevision: 0.76.1
+      helm:
+        values: |
+          gitlabUrl: https://gitlab.com
+          runners:
+            secret: gitlab-runner
+            config: |
+            [[runners]]
+              [runners.kubernetes]
+                image = "alpine"
+                service_account = "gitlab-runner"
+                namespace = "gitlab"
+                privileged = true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitlab
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
