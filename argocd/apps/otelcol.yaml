@@ -1,0 +1,80 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otelcol
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: "https://open-telemetry.github.io/opentelemetry-helm-charts"
+      targetRevision: 0.124.0
+      chart: opentelemetry-collector
+      helm:
+        values: |
+          mode: deployment
+          replicaCount: 1
+          image:
+            repository: otel/opentelemetry-collector-k8s
+            tag: "latest"
+          command:
+            name: "otelcol-k8s"
+          config:
+            exporters:
+              debug: {}
+              otlp:
+                endpoint: tempo-distributor.monitoring.svc.cluster.local:4317
+                tls:
+                  insecure: true
+              otlphttp/prometheus:
+                endpoint: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/otlp
+                tls:
+                  insecure: true
+
+            receivers:
+              jaeger: null
+              prometheus: null
+              zipkin: null
+              otlp:
+                protocols:
+                  grpc:
+                    endpoint: 0.0.0.0:4317
+                  http:
+                    endpoint: 0.0.0.0:4318
+            service:
+              extensions:
+                - health_check
+              pipelines:
+                metrics:
+                  exporters:
+                    - debug
+                    - otlphttp/prometheus
+                  processors:
+                    - memory_limiter
+                    - batch
+                  receivers:
+                    - otlp
+                traces:
+                  exporters:
+                    - debug
+                    - otlp
+                  processors:
+                    - memory_limiter
+                    - batch
+                  receivers:
+                    - otlp
+                logs: null
+          ports:
+            jaeger-compact:
+              enabled: false
+            jaeger-thrift:
+              enabled: false
+            jaeger-grpc:
+              enabled: false
+            zipkin:
+              enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

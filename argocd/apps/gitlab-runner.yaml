@@ -16,7 +16,11 @@ spec:
       helm:
         values: |
           gitlabUrl: https://gitlab.com
+          serviceAccount:
+            create: false
+            name: gitlab-runner
           runners:
+            serviceAccountName: gitlab-runner
             secret: gitlab-runner
             config: |
               [[runners]]

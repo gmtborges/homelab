@@ -88,10 +88,10 @@ spec:
                 type: loki
                 url: http://loki-gateway.monitoring.svc.cluster.local
                 access: proxy
-                #   - name: Tempo
-                #     type: tempo
-                #     url: http://tempo-query-frontend.monitoring.svc.cluster.local:3100
-                #     access: proxy
+              - name: Tempo
+                type: tempo
+                url: http://tempo-query-frontend.monitoring.svc.cluster.local:3100
+                access: proxy
           alertmanager:
             serviceMonitor:
               enabled: false
