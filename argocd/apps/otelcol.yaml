@@ -70,6 +70,7 @@ spec:
               enabled: false
     - repoURL: https://github.com/gmtborges/homelab.git
       targetRevision: HEAD
+      ref: manifests
       path: argocd/manifests/otelcol
   destination:
     server: https://kubernetes.default.svc
