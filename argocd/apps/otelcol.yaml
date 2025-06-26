@@ -41,9 +41,6 @@ spec:
                   http:
                     endpoint: 0.0.0.0:4318
             service:
-              telemetry:
-                metrics:
-                  address: 0.0.0.0:8888
               extensions:
                 - health_check
               pipelines:
@@ -67,6 +64,8 @@ spec:
             jaeger-grpc:
               enabled: false
             zipkin:
+              enabled: false
+            metrics:
               enabled: false
     - repoURL: https://github.com/gmtborges/homelab.git
       targetRevision: HEAD
