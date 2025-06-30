@@ -9,6 +9,24 @@ spec:
     - repoURL: ghcr.io/gitroomhq/postiz-helmchart/charts
       chart: postiz-app
       targetRevision: 1.0.5
+      helm:
+        values: |
+          env:
+            MAIN_URL: "https://postiz.gbsoft.net"
+            FRONTEND_URL: "http://localhost:4200"
+            NEXT_PUBLIC_BACKEND_URL: "http://localhost:3000"
+            BACKEND_INTERNAL_URL: "http://backend:3000"
+            UPLOAD_DIRECTORY: "/uploads"
+            NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY: "/uploads"
+            NX_ADD_PLUGINS: "false"
+            IS_GENERAL: "true"
+            DISABLE_REGISTRATION: "true"
+            STORAGE_PROVIDER: "local"
+            NOT_SECURED: "true"
+          secrets:
+            DATABASE_URL: "postgresql://postiz:postiz-password@postiz-postgresql:5432/postiz"
+            REDIS_URL: "redis://:postiz-redis-password@postiz-redis-master:6379"
+            JWT_SECRET: "f7GR468AqjkmDVS29/Zo2UlbqTmJjAPfgsxns44q0ZQ="
     - repoURL: https://github.com/gmtborges/homelab.git
       path: argocd/manifests/postiz
       targetRevision: HEAD
