@@ -13,9 +13,9 @@ spec:
         values: |
           env:
             MAIN_URL: "https://postiz.gbsoft.net"
-            FRONTEND_URL: "http://localhost:4200"
-            NEXT_PUBLIC_BACKEND_URL: "http://localhost:3000"
-            BACKEND_INTERNAL_URL: "http://backend:3000"
+            FRONTEND_URL: "https://postiz.gbsoft.net"
+            NEXT_PUBLIC_BACKEND_URL: "https://postiz.gbsoft.net/api"
+            BACKEND_INTERNAL_URL: "http://localhost:3000"
             UPLOAD_DIRECTORY: "/uploads"
             NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY: "/uploads"
             NX_ADD_PLUGINS: "false"
