@@ -1,4 +1,4 @@
-hostname: "k8s-controlplane"
+hostname: "k8s-control-plane"
 ip_address: "192.168.1.20"
 gateway: "192.168.1.1"
 dns: ["8.8.8.8", "8.8.4.4"]

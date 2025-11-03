@@ -1,0 +1,14 @@
+- hosts: k8s_nodes
+  become: true
+  vars:
+    control_plane_ip: "{{ hostvars['master']['ansible_host'] }}"
+  tasks:
+    - name: Get discovery token from control plane
+      shell: kubeadm token create --print-join-command
+      register: join_command
+      delegate_to: k8s_control_plane1
+      run_once: true
+
+    - name: Join nodes to the control plane
+      command: "{{ join_command.stdout }}"
+      when: join_command.stdout != ""

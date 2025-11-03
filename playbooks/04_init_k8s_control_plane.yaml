@@ -14,9 +14,3 @@
     - name: Install Flannel network plugin
       command: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
       when: "'flannel' in kubeadm_output.stdout"
-- hosts: k8s_nodes
-  become: true
-  tasks:
-    - name: Join nodes to the control plane
-      command: "{{ hostvars['master']['kubeadm_output']['stdout_lines'][0] }}"
-      when: "'kubeadm join' in hostvars['master']['kubeadm_output']['stdout']"
