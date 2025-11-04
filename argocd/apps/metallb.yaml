@@ -11,7 +11,7 @@ spec:
       chart: metallb
     - repoURL: https://github.com/gmtborges/homelab.git
       targetRevision: HEAD
-      ref: manifests
+      path: argocd/manifests/metallb
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system
