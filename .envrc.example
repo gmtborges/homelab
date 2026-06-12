@@ -1,0 +1,11 @@
+# Copy this file to .envrc (gitignored), fill in real values, then run: direnv allow
+
+# Proxmox VE API token (user@realm!tokenid=secret) — create with:
+#   pveum user token add terraform@pve provider --privsep 0
+export PROXMOX_VE_API_TOKEN="terraform@pve!provider=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# SSH public key injected into each VM's cloud-init user
+export PROXMOX_VM_SSH_PUBLIC_KEY="$(cat ~/.ssh/id_ed25519.pub)"
+
+# AWS profile for the Terragrunt S3 state backend (bucket: gbsoft-homelab-tfstate)
+export AWS_PROFILE="homelab"

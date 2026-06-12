@@ -2,14 +2,19 @@
 .DS_Store
 .env
 
+# direnv
+.direnv/
+.envrc
+
 # Ansible
 vars/*.yml
 *.vault
 .vault_pass
 
 # Terraform 
-# Local .terraform directories
+# Local .terraform directories and terragrunt cache
 **/.terraform/*
+.terragrunt-cache/
 
 # .tfstate files
 *.tfstate
