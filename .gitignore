@@ -4,6 +4,7 @@
 
 # direnv
 .direnv/
+.envrc
 
 # Ansible
 vars/*.yml
@@ -13,7 +14,7 @@ vars/*.yml
 # Terraform 
 # Local .terraform directories and terragrunt cache
 **/.terraform/*
-**/.terragrunt-cache/*
+.terragrunt-cache/
 
 # .tfstate files
 *.tfstate
