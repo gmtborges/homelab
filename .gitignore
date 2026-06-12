@@ -2,6 +2,9 @@
 .DS_Store
 .env
 
+# direnv
+.direnv/
+
 # Ansible
 vars/*.yml
 *.vault
