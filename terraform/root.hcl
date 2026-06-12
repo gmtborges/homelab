@@ -7,7 +7,7 @@ remote_state {
   }
 
   config = {
-    bucket       = "gmtborges-homelab-tfstate"
+    bucket       = "gbsoft-homelab-tfstate"
     key          = "${path_relative_to_include()}/terraform.tfstate"
     region       = "us-east-2"
     encrypt      = true
