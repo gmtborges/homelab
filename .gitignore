@@ -8,8 +8,9 @@ vars/*.yml
 .vault_pass
 
 # Terraform 
-# Local .terraform directories
+# Local .terraform directories and terragrunt cache
 **/.terraform/*
+**/.terragrunt-cache/*
 
 # .tfstate files
 *.tfstate
