@@ -10,6 +10,7 @@
 vars/*.yml
 *.vault
 .vault_pass
+playbooks/kubeconfig
 
 # Terraform 
 # Local .terraform directories and terragrunt cache

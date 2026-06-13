@@ -1,0 +1,7 @@
+write-kubeconfig-mode: "0644"
+tls-san:
+  - "{{ k3s_server_ip }}"
+disable:
+{% for component in k3s_disable %}
+  - {{ component }}
+{% endfor %}

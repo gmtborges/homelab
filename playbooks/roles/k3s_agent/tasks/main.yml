@@ -1,0 +1,43 @@
+---
+- name: Verify the k3s node token was provided
+  ansible.builtin.assert:
+    that:
+      - k3s_node_token is defined
+      - k3s_node_token | length > 0
+    fail_msg: "k3s_node_token is empty — the server play must run first to register it."
+
+- name: Ensure k3s config directory exists
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Render k3s agent config
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Restart k3s-agent
+
+- name: Check the installed k3s version
+  ansible.builtin.command: k3s --version
+  register: k3s_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install k3s agent
+  ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -s -
+  environment:
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+    INSTALL_K3S_EXEC: agent
+  when: k3s_version not in k3s_installed.stdout
+
+- name: Ensure k3s-agent service is enabled and running
+  ansible.builtin.systemd:
+    name: k3s-agent
+    enabled: true
+    state: started

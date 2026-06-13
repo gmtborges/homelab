@@ -1,0 +1,59 @@
+---
+- name: Prepare all nodes
+  hosts: all
+  become: true
+  roles:
+    - node_prep
+
+- name: Install k3s server
+  hosts: server
+  become: true
+  roles:
+    - k3s_server
+  post_tasks:
+    - name: Wait for the k3s node token to be generated
+      ansible.builtin.wait_for:
+        path: /var/lib/rancher/k3s/server/node-token
+        timeout: 120
+
+    - name: Read the k3s node token
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: k3s_node_token_raw
+      no_log: true
+
+    - name: Register the node token as a fact
+      ansible.builtin.set_fact:
+        k3s_node_token: "{{ k3s_node_token_raw.content | b64decode | trim }}"
+      no_log: true
+
+- name: Install and join k3s agents
+  hosts: agents
+  become: true
+  vars:
+    k3s_node_token: "{{ hostvars[groups['server'][0]].k3s_node_token }}"
+  roles:
+    - k3s_agent
+
+- name: Fetch kubeconfig to the control machine
+  hosts: server
+  become: true
+  tasks:
+    - name: Wait for the cluster kubeconfig to be written
+      ansible.builtin.wait_for:
+        path: /etc/rancher/k3s/k3s.yaml
+        timeout: 120
+
+    - name: Read the cluster kubeconfig
+      ansible.builtin.slurp:
+        src: /etc/rancher/k3s/k3s.yaml
+      register: k3s_kubeconfig_raw
+
+    - name: Write kubeconfig locally with the server address rewritten
+      ansible.builtin.copy:
+        content: "{{ k3s_kubeconfig_raw.content | b64decode | replace('127.0.0.1', k3s_server_ip) }}"
+        dest: "{{ kubeconfig_local_path }}"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      no_log: true

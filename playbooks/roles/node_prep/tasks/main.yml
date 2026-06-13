@@ -1,0 +1,29 @@
+---
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - qemu-guest-agent
+      - curl
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Check for the guest-agent virtio channel
+  ansible.builtin.stat:
+    path: /dev/virtio-ports/org.qemu.guest_agent.0
+  register: qga_channel
+
+- name: Start qemu-guest-agent when its virtio channel is present
+  ansible.builtin.systemd:
+    name: qemu-guest-agent
+    state: started
+  when: qga_channel.stat.exists
+
+- name: Disable sshd password authentication
+  ansible.builtin.template:
+    src: disable-password-auth.conf.j2
+    dest: /etc/ssh/sshd_config.d/10-disable-password-auth.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ssh
