@@ -1,11 +1,3 @@
-resource "proxmox_download_file" "debian" {
-  content_type = "import"
-  datastore_id = var.image_datastore
-  node_name    = var.node_name
-  url          = var.debian_image_url
-  file_name    = "debian-13-genericcloud-amd64.qcow2"
-}
-
 resource "proxmox_virtual_environment_vm" "template" {
   name      = "debian-13-template"
   node_name = var.node_name
@@ -29,7 +21,7 @@ resource "proxmox_virtual_environment_vm" "template" {
   disk {
     datastore_id = var.disk_datastore
     interface    = "scsi0"
-    import_from  = proxmox_download_file.debian.id
+    import_from  = "${var.image_datastore}:import/${var.debian_image_file}"
     size         = var.default_disk_size
   }
 

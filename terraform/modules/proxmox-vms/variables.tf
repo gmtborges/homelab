@@ -4,7 +4,7 @@ variable "node_name" {
 }
 
 variable "image_datastore" {
-  description = "Datastore for the downloaded cloud image (must allow the 'import' content type)."
+  description = "Datastore holding the imported cloud image (must allow the 'import' content type)."
   type        = string
   default     = "local"
 }
@@ -49,10 +49,10 @@ variable "ssh_public_key" {
   }
 }
 
-variable "debian_image_url" {
-  description = "URL of the Debian genericcloud qcow2 image."
+variable "debian_image_file" {
+  description = "File name of the manually imported Debian genericcloud image (content type 'import')."
   type        = string
-  default     = "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+  default     = "debian-13-genericcloud-amd64.qcow2"
 }
 
 variable "template_vm_id" {
