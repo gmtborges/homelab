@@ -6,6 +6,17 @@ terraform {
   source = "../modules/proxmox-vms"
 }
 
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<-EOT
+    provider "proxmox" {
+      endpoint = "https://192.168.1.10:8006/"
+      insecure = true
+    }
+  EOT
+}
+
 inputs = {
   node_name       = "pve"
   image_datastore = "local"

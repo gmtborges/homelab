@@ -8,11 +8,14 @@ spec:
   sources:
     - chart: longhorn
       repoURL: https://charts.longhorn.io/
-      targetRevision: v1.8.1
+      targetRevision: 1.12.0
       helm:
         values: |
           preUpgradeChecker:
             jobEnabled: false
+          defaultSettings:
+            backupTarget: s3://gbsoft-homelab-longhorn-backup@us-east-2/
+            backupTargetCredentialSecret: longhorn-backup-secret
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system

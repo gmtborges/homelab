@@ -6,8 +6,8 @@ their IPs for the later Ansible/k3s phase. State lives in AWS S3.
 
 Layout:
 
-- `root.hcl` — Terragrunt root: S3 remote state + generated `bpg/proxmox` provider.
-- `proxmox-vms/terragrunt.hcl` — the unit; defines the VM map and host inputs.
+- `root.hcl` — Terragrunt root: shared S3 remote state. Each unit generates its own provider.
+- `proxmox-vms/terragrunt.hcl` — the unit; generates the `bpg/proxmox` provider and defines the VM map and host inputs.
 - `modules/proxmox-vms/` — reusable module: image download, template VM, `for_each` clone, outputs.
 
 ## Prerequisites
@@ -96,3 +96,27 @@ Outputs:
   ```
 
 The k3s install runs from `playbooks/` via Ansible as a separate, later phase; this layer's job ends at reachable VMs plus the IP outputs.
+
+## Longhorn S3 backup
+
+The `longhorn-backup/` unit provisions an S3 bucket and a least-privilege IAM user that Longhorn uses to store volume backups. Both live in the same AWS account as the Terraform state (profile `homelab`, region `us-east-2`).
+
+Apply the unit:
+
+```sh
+cd terraform/longhorn-backup
+terragrunt apply
+```
+
+The IAM access key is written to Terraform state and exposed as sensitive outputs (not printed by `apply`). Read them and create the Kubernetes Secret Longhorn reads — this secret is never committed to git:
+
+```sh
+kubectl create namespace longhorn-system   # skip if ArgoCD already synced the app
+
+kubectl create secret generic longhorn-backup-secret \
+  --namespace longhorn-system \
+  --from-literal=AWS_ACCESS_KEY_ID="$(terragrunt output -raw access_key_id)" \
+  --from-literal=AWS_SECRET_ACCESS_KEY="$(terragrunt output -raw secret_access_key)"
+```
+
+The secret name (`longhorn-backup-secret`) and the backup target (`terragrunt output -raw backup_target`) must match `defaultSettings.backupTargetCredentialSecret` and `defaultSettings.backupTarget` in `argocd/apps/longhorn.yaml`. Once the secret exists, ArgoCD syncs Longhorn and the backup target reports healthy in the Longhorn UI.
