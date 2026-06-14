@@ -4,9 +4,16 @@
     name:
       - qemu-guest-agent
       - curl
+      - open-iscsi
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Ensure iscsid is enabled and running for Longhorn
+  ansible.builtin.systemd:
+    name: iscsid
+    enabled: true
+    state: started
 
 - name: Check for the guest-agent virtio channel
   ansible.builtin.stat:
