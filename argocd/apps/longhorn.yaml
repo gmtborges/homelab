@@ -13,7 +13,7 @@ spec:
         values: |
           preUpgradeChecker:
             jobEnabled: false
-          defaultSettings:
+          defaultBackupStore:
             backupTarget: s3://gbsoft-homelab-longhorn-backup@us-east-2/
             backupTargetCredentialSecret: longhorn-backup-secret
   destination:

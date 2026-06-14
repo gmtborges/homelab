@@ -119,4 +119,4 @@ kubectl create secret generic longhorn-backup-secret \
   --from-literal=AWS_SECRET_ACCESS_KEY="$(terragrunt output -raw secret_access_key)"
 ```
 
-The secret name (`longhorn-backup-secret`) and the backup target (`terragrunt output -raw backup_target`) must match `defaultSettings.backupTargetCredentialSecret` and `defaultSettings.backupTarget` in `argocd/apps/longhorn.yaml`. Once the secret exists, ArgoCD syncs Longhorn and the backup target reports healthy in the Longhorn UI.
+The secret name (`longhorn-backup-secret`) and the backup target (`terragrunt output -raw backup_target`) must match `defaultBackupStore.backupTargetCredentialSecret` and `defaultBackupStore.backupTarget` in `argocd/apps/longhorn.yaml`. Once the secret exists, ArgoCD syncs Longhorn and the backup target reports healthy in the Longhorn UI.
