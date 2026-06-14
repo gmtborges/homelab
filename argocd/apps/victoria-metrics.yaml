@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: victoria-metrics
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: victoria-metrics-single
+    repoURL: https://victoriametrics.github.io/helm-charts/
+    targetRevision: 0.40.1
+    helm:
+      values: |
+        server:
+          persistentVolume:
+            enabled: true
+            storageClassName: longhorn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: victoria-metrics
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
