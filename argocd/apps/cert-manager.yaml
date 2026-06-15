@@ -5,15 +5,20 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: "https://charts.jetstack.io"
-    targetRevision: 1.17.2
-    chart: cert-manager
-    helm:
-      valuesObject:
-        installCRDs: true
-        extraArgs:
-          - "--enable-gateway-api"
+  sources:
+    - repoURL: "https://charts.jetstack.io"
+      targetRevision: 1.17.2
+      chart: cert-manager
+      helm:
+        valuesObject:
+          installCRDs: true
+          extraArgs:
+            - "--enable-gateway-api"
+            - "--dns01-recursive-nameservers-only"
+            - "--dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53"
+    - repoURL: https://github.com/gmtborges/homelab.git
+      targetRevision: HEAD
+      path: argocd/manifests/cert-manager
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
