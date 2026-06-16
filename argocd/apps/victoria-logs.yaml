@@ -5,16 +5,19 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    chart: victoria-logs-single
-    repoURL: https://victoriametrics.github.io/helm-charts/
-    targetRevision: 0.13.7
-    helm:
-      values: |
-        server:
-          persistentVolume:
-            enabled: true
-            storageClassName: longhorn
+  sources:
+    - chart: victoria-logs-single
+      repoURL: https://victoriametrics.github.io/helm-charts/
+      targetRevision: 0.13.7
+      helm:
+        values: |
+          server:
+            persistentVolume:
+              enabled: true
+              storageClassName: longhorn
+    - repoURL: https://github.com/gmtborges/homelab.git
+      targetRevision: HEAD
+      path: argocd/manifests/victoria-logs
   destination:
     server: https://kubernetes.default.svc
     namespace: victoria-logs
